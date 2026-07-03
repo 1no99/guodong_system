@@ -5,7 +5,9 @@
         <div class="card-header">
           <span>商品管理</span>
           <el-button type="primary" @click="handleAdd">
-            <el-icon><Plus /></el-icon>
+            <el-icon>
+              <Plus />
+            </el-icon>
             添加商品
           </el-button>
         </div>
@@ -19,18 +21,15 @@
         <el-form-item label="分类">
           <el-select v-model="searchForm.category_id" style="width: 200px;" placeholder="请选择分类" clearable>
             <el-option label="全部" :value="0" />
-            <el-option
-              v-for="cat in categoryList"
-              :key="cat.id"
-              :label="cat.name"
-              :value="cat.id"
-            />
+            <el-option v-for="cat in categoryList" :key="cat.id" :label="cat.name" :value="cat.id" />
           </el-select>
         </el-form-item>
-    
+
         <el-form-item>
           <el-button type="primary" @click="handleSearch">
-            <el-icon><Search /></el-icon>
+            <el-icon>
+              <Search />
+            </el-icon>
             搜索
           </el-button>
           <el-button @click="handleReset">重置</el-button>
@@ -41,11 +40,8 @@
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column label="商品图片" width="100">
           <template #default="{ row }">
-            <el-image
-              :src="getImageUrl(row.main_image)"
-              fit="cover"
-              style="width: 60px; height: 60px; border-radius: 4px;"
-            />
+            <el-image :src="getImageUrl(row.main_image)" fit="cover"
+              style="width: 60px; height: 60px; border-radius: 4px;" />
           </template>
         </el-table-column>
         <el-table-column prop="name" label="商品名称" />
@@ -76,29 +72,17 @@
         </el-table-column>
       </el-table>
 
-      <el-pagination
-        v-model:current-page="pagination.current"
-        v-model:page-size="pagination.pageSize"
-        :page-sizes="[5, 20, 50, 100]"
-        :total="pagination.total"
-        layout="total, sizes, prev, pager, next, jumper"
-        style="margin-top: 20px; justify-content: flex-end;"
-        @size-change="handlePageSizeChange"
-        @current-change="handlePageChange"
-      />
+      <el-pagination v-model:current-page="pagination.current" v-model:page-size="pagination.pageSize"
+        :page-sizes="[5, 20, 50, 100]" :total="pagination.total" layout="total, sizes, prev, pager, next, jumper"
+        style="margin-top: 20px; justify-content: flex-end;" @size-change="handlePageSizeChange"
+        @current-change="handlePageChange" />
     </el-card>
 
     <!-- 添加/编辑弹窗 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :close-on-click-modal="false"
-      :title="dialogTitle"
-      width="1100px"
-      top="5vh"
-      @close="handleDialogClose"
-    >
+    <el-dialog v-model="dialogVisible" :close-on-click-modal="false" :title="dialogTitle" width="1100px" top="5vh"
+      @close="handleDialogClose">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
-        <el-form-item label="商品名称" prop="name" >
+        <el-form-item label="商品名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商品名称" />
         </el-form-item>
         <el-form-item label="副标题" prop="subtitle">
@@ -107,51 +91,32 @@
         <el-form-item label="分类" prop="category_id">
           <el-select v-model="form.category_id" placeholder="请选择分类" style="width: 100%;">
             <el-option label="请选择分类" :value="0" />
-            <el-option
-              v-for="cat in categoryList"
-              :key="cat.id"
-              :label="cat.name"
-              :value="cat.id"
-            />
+            <el-option v-for="cat in categoryList" :key="cat.id" :label="cat.name" :value="cat.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="商品主图" prop="main_image">
-          <el-upload
-            class="avatar-uploader"
-            action="#"
-            :show-file-list="false"
-            :auto-upload="false"
-            :on-change="handleImageChange"
-          >
+          <el-upload class="avatar-uploader" action="#" :show-file-list="false" :auto-upload="false"
+            :on-change="handleImageChange">
             <img v-if="form.main_image" :src="getImageUrl(form.main_image)" class="avatar" />
-            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            <el-icon v-else class="avatar-uploader-icon">
+              <Plus />
+            </el-icon>
           </el-upload>
         </el-form-item>
         <el-form-item label="商品详情图">
           <div class="detail-images-uploader">
-            <div
-              v-for="(_image, index) in 5"
-              :key="index"
-              class="image-upload-item"
-            >
-              <el-upload
-                class="avatar-uploader"
-                action="#"
-                :show-file-list="false"
-                :auto-upload="false"
-                :on-change="(file: UploadFile) => handleDetailImageChange(file, index)"
-              >
-                <img v-if="getDetailImageUrl(index)" :src="getImageUrl(getDetailImageUrl(index))" class="detail-avatar" />
-                <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            <div v-for="(_image, index) in 5" :key="index" class="image-upload-item">
+              <el-upload class="avatar-uploader" action="#" :show-file-list="false" :auto-upload="false"
+                :on-change="(file: UploadFile) => handleDetailImageChange(file, index)">
+                <img v-if="getDetailImageUrl(index)" :src="getImageUrl(getDetailImageUrl(index))"
+                  class="detail-avatar" />
+                <el-icon v-else class="avatar-uploader-icon">
+                  <Plus />
+                </el-icon>
               </el-upload>
               <div class="image-label">图片{{ index + 1 }}</div>
-              <el-button
-                v-if="getDetailImageUrl(index)"
-                type="danger"
-                size="small"
-                @click="removeDetailImage(index)"
-                style="margin-top: 4px"
-              >
+              <el-button v-if="getDetailImageUrl(index)" type="danger" size="small" @click="removeDetailImage(index)"
+                style="margin-top: 4px">
                 删除
               </el-button>
             </div>
@@ -159,44 +124,42 @@
         </el-form-item>
 
         <el-form-item label="商品规格" prop="spec_ids">
-           <el-button type="primary" @click="dialogVisible_type = true">配置规格</el-button>
-           <el-button type="primary" @click="opendio">一键配置（价格/库存）</el-button>
+          <el-button type="primary" @click="dialogVisible_type = true,dynamicTags2 = [],dynamicTags = []">配置规格</el-button>
+          <el-button type="primary" @click="opendio">一键配置（价格/库存）</el-button>
         </el-form-item>
-         <el-form-item label="商品规格" prop="spec_ids">
-             <el-table :data="tableData" style="width: 100%" border :span-method="spanMethod">
-              <el-table-column prop="parentName" label="颜色类型"  />
-              <el-table-column prop="childName" label="规格尺码"  />
-              <el-table-column prop="price" label="价格" >
-                <template #default="{ row }">
-                  <el-input v-model="row.price" placeholder="请输入价格" />
-                </template>
-              </el-table-column>
-              <el-table-column prop="stock" label="库存" >
-                <template #default="{ row }">
-                  <el-input v-model="row.stock" placeholder="请输入库存" />
-                </template>
-              </el-table-column>
-              <el-table-column prop="typeimg" label="花色图" >
-                <template #default="{ row }">
-                  <el-upload
-                    style="width: 50px;height: 50px;border: 1px solid #ccc;
-                    text-align: center;line-height: 50px;cursor: pointer;border-radius: 10px;"
-                    action="#"
-                    :show-file-list="false"
-                    :auto-upload="false"
-                    :on-change="(file: UploadFile) => tabTypeimg(file, 0, row)"
-                  >
-                    <img v-if="row.typeimg" :src="getImageUrl(row.typeimg)" class="avatar" />
-                    <el-icon v-else ><Plus /></el-icon>
-                  </el-upload>
-                </template>
-              </el-table-column>
-              <el-table-column prop="" label="操作" width="100">
-                <template #default="{ row }">
-                  <el-button type="danger" @click="handleDeleteSpec(row)">删除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
+        <el-form-item label="商品规格" prop="spec_ids">
+          <el-table :data="tableData" style="width: 100%" border :span-method="spanMethod">
+            <el-table-column prop="parentName" label="颜色类型" />
+            <el-table-column prop="childName" label="规格尺码" />
+            <el-table-column prop="price" label="价格">
+              <template #default="{ row }">
+                <el-input v-model="row.price" placeholder="请输入价格" />
+              </template>
+            </el-table-column>
+            <el-table-column prop="stock" label="库存">
+              <template #default="{ row }">
+                <el-input v-model="row.stock" placeholder="请输入库存" />
+              </template>
+            </el-table-column>
+            <el-table-column prop="typeimg" label="花色图">
+              <template #default="{ row }">
+                <el-upload style="width: 50px;height: 50px;border: 1px solid #ccc;
+                    text-align: center;line-height: 50px;cursor: pointer;border-radius: 10px;" action="#"
+                  :show-file-list="false" :auto-upload="false"
+                  :on-change="(file: UploadFile) => tabTypeimg(file, 0, row)">
+                  <img v-if="row.typeimg" :src="getImageUrl(row.typeimg)" class="avatar" />
+                  <el-icon v-else>
+                    <Plus />
+                  </el-icon>
+                </el-upload>
+              </template>
+            </el-table-column>
+            <el-table-column prop="" label="操作" width="100">
+              <template #default="{ row }">
+                <el-button type="danger" @click="handleDeleteSpec(row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -204,92 +167,69 @@
         <el-button type="primary" @click="handleSubmit">确定</el-button>
       </template>
     </el-dialog>
-     <el-dialog
-     :close-on-click-modal="false"
-      v-model="dialogVisible_type"
-      title="规格配置"
-      width="700px"
-    >
-       
-       <h3 >规格尺码</h3>
-        <div style="margin: 10px 0;"> 
-            <el-tag
-            size="large"
-            v-for="tag of dynamicTags"
-            :key="tag"
-            closable
-            style="margin: 10px 10px 0 0px;"
-            :disable-transitions="false"
-            @close="handleClose(tag, 1)"
-          >
-                {{ tag.spec_name }}
-            </el-tag>
-        </div>
-        <div> <el-input v-model="tagInput" style="width: 400px" clearable placeholder="请输入规格尺码（支持批量填写如：S, M, L）" />
+    <el-dialog :close-on-click-modal="false" v-model="dialogVisible_type" title="规格配置" width="700px">
+      <h3 >规格尺码 </h3>
+      <div style="margin: 10px 0;">
+        <el-tag size="large" v-for="tag of dynamicTags2" :key="tag" closable style="margin: 10px 10px 0 0px;"
+          :disable-transitions="false" @close="handleClose(tag, 2)">
+          {{ tag.spec_name }}
+        </el-tag>
+      </div>
+      <div> <el-input v-model="tagInput2" style="width: 400px" clearable placeholder="请输入颜色类型（支持批量填写如：红色, 蓝色, 绿色）" />
+        <el-button style="margin-left: 10px;" type="primary" @click="addtabInfo(2)">确定</el-button>
+      </div>
+      <h3 style="margin-top: 10px;">颜色类型</h3>
+      <div style="margin: 10px 0;">
+        <el-tag size="large" v-for="tag of dynamicTags" :key="tag" closable style="margin: 10px 10px 0 0px;"
+          :disable-transitions="false" @close="handleClose(tag, 1)">
+          {{ tag.spec_name }}
+        </el-tag>
+      </div>
+      <div> <el-input v-model="tagInput" style="width: 400px" clearable placeholder="请输入规格尺码（支持批量填写如：S, M, L）" />
         <el-button style="margin-left: 10px;" type="primary" @click="addtabInfo(1)">确定</el-button>
-        </div>
-         <!-- <el-select v-model="form_type.ggcm" filterable placeholder="请选择分类" clearable multiple>
+      </div>
+      <!-- <el-select v-model="form_type.ggcm" filterable placeholder="请选择分类" clearable multiple>
             <el-option :label="value.spec_name" :value="value.spec_name"  v-for="value in specList" />
           </el-select> -->
-        
-        <h3 style="margin-top: 10px;">颜色类型 </h3>
-           <div style="margin: 10px 0;"> 
-            <el-tag
-              size="large"
-            v-for="tag of dynamicTags2"
-            :key="tag"
-            closable
-             style="margin: 10px 10px 0 0px;"
-            :disable-transitions="false"
-            @close="handleClose(tag, 2)"
-          >
-                {{ tag.spec_name }}
-            </el-tag>
-        </div>
-        <div> <el-input v-model="tagInput2" style="width: 400px" clearable placeholder="请输入颜色类型（支持批量填写如：红色, 蓝色, 绿色）" />
-        <el-button style="margin-left: 10px;" type="primary"  @click="addtabInfo(2)">确定</el-button></div>
-         <!-- <el-select v-model="form_type.colortype" filterable placeholder="请选择分类" clearable multiple>
+
+
+      <!-- <el-select v-model="form_type.colortype" filterable placeholder="请选择分类" clearable multiple>
             <el-option :label="value.spec_name" :value="value.spec_name"  v-for="value in specList" />
           </el-select> -->
-       
-       <template #footer>
+
+      <template #footer>
         <el-button @click="dialogVisible_type = false">取消</el-button>
         <el-button type="primary" @click="SubmitType">确定</el-button>
       </template>
-     </el-dialog>
-     <el-dialog
-     :close-on-click-modal="false"
-      v-model="dialogVisible_Money"
-      title="价格配置"
-      width="700px"
-    >
-    <el-form :model="form_Money"  ref="formRef" label-width="100px">
-        <el-form-item label="需配置的类型" prop="name" >
-         <el-select v-model="form_Money.type"  placeholder="请选择分类" clearable >
-            <el-option label="价格" value="1"   />
-            <el-option label="库存" value="2"   />
+    </el-dialog>
+    <el-dialog :close-on-click-modal="false" v-model="dialogVisible_Money" title="价格配置" width="700px">
+      <el-form :model="form_Money" ref="formRef" label-width="100px">
+        <el-form-item label="需配置的类型" prop="name">
+          <el-select v-model="form_Money.type" placeholder="请选择分类" clearable>
+            <el-option label="价格" value="1" />
+            <el-option label="库存" value="2" />
           </el-select>
         </el-form-item>
-       <el-form-item label="配置层级" prop="name" >
-         <el-select v-model="form_Money.typecg"  placeholder="请选择分类" @change="getgoodtypelist" clearable >
-            <el-option label="按颜色类型" value="1"   />
-            <el-option label="按规格尺码" value="2"   />
+        <el-form-item label="配置层级" prop="name">
+          <el-select v-model="form_Money.typecg" placeholder="请选择分类" @change="getgoodtypelist" clearable>
+            <el-option label="按颜色类型" value="1" />
+            <el-option label="按规格尺码" value="2" />
           </el-select>
         </el-form-item>
-        <el-form-item label="配置详情项" prop="name" >
-         <el-select v-model="form_Money.systemdetil"  placeholder="请选择分类" clearable >
-            <el-option :label="item" v-for="(item,key) in optionList" :value="item" :key="key" />
+        <el-form-item label="配置详情项" prop="name">
+          <el-select v-model="form_Money.systemdetil" placeholder="请选择分类" clearable>
+            <el-option :label="item" v-for="(item, key) in optionList" :value="item" :key="key" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="form_Money.type === '1' ? '价格' : '库存'" prop="name" >
+        <el-form-item :label="form_Money.type === '1' ? '价格' : '库存'" prop="name">
           <el-input v-model="form_Money.monynum" :placeholder="form_Money.type === '1' ? '请输入价格' : '请输入库存'" />
         </el-form-item>
       </el-form>
-       <template #footer>
+      <template #footer>
         <el-button @click="dialogVisible_Money = false">取消</el-button>
         <el-button type="primary" @click="Submitchangt">确定</el-button>
       </template>
-     </el-dialog>
+    </el-dialog>
   </div>
 </template>
 
@@ -333,8 +273,8 @@ interface Category {
   parent_id: number
 }
 const form_type = ref({
-  colortype:[],
-  ggcm:[]
+  colortype: [],
+  ggcm: []
 })
 
 interface TableDataItem {
@@ -345,10 +285,10 @@ interface TableDataItem {
 const dialogVisible_Money = ref(false)
 const tableData = ref<TableDataItem[]>([])
 const form_Money = ref({
-  type:'',
-  typecg:'',
-  systemdetil:'',
-  monynum:''
+  type: '',
+  typecg: '',
+  systemdetil: '',
+  monynum: ''
 })
 // 单元格合并方法
 const spanMethod = ({ row, rowIndex, columnIndex }: any) => {
@@ -389,7 +329,7 @@ const specList = ref<any[]>([])
 const dialogVisible_type = ref(false)
 const searchForm = reactive({
   name: '',
-  category_id:null,
+  category_id: null,
   status: ''
 })
 
@@ -404,26 +344,26 @@ const dynamicTags = ref<any[]>([])
 const dynamicTags2 = ref<any[]>([])
 const tagInput2 = ref('')
 const tagInput = ref('')
-const handleClose = (tag: any,type:any) => {
-    handleDeleteaddtabInfo(tag,type)
- 
+const handleClose = (tag: any, type: any) => {
+  handleDeleteaddtabInfo(tag, type)
+
 }
-const addtabInfo = (type:any) => {
-  if(type == 1){
+const addtabInfo = (type: any) => {
+  if (type == 1) {
     // 按中英文逗号分隔，支持混合输入
     const names = tagInput.value.split(/[,，]/).map(s => s.trim()).filter(Boolean)
-    for(const name of names){
-      if(dynamicTags.value.some(y => y.spec_name === name)){
+    for (const name of names) {
+      if (dynamicTags.value.some(y => y.spec_name === name)) {
         ElMessage.warning(`规格尺码"${name}"已存在，已跳过`)
         continue
       }
       handleSubmitaddtabInfo(name, 1)
     }
     tagInput.value = ''
-  }else if(type == 2){
+  } else if (type == 2) {
     const names = tagInput2.value.split(/[,，]/).map(s => s.trim()).filter(Boolean)
-    for(const name of names){
-      if(dynamicTags2.value.some(y => y.spec_name === name)){
+    for (const name of names) {
+      if (dynamicTags2.value.some(y => y.spec_name === name)) {
         ElMessage.warning(`颜色类型"${name}"已存在，已跳过`)
         continue
       }
@@ -432,74 +372,74 @@ const addtabInfo = (type:any) => {
     tagInput2.value = ''
   }
 }
-const handleSubmitaddtabInfo = async (name: string,type: number) => {
- 
-      try {
-        const data = {
+const handleSubmitaddtabInfo = async (name: string, type: number) => {
+
+  try {
+    const data = {
+      spec_name: name,
+      sort_order: 1
+    }
+    let res: any
+    res = await createSpec(data)
+    if (res.code === 0) {
+      if (type == 1) {
+        dynamicTags.value.push({
           spec_name: name,
-          sort_order: 1
-        }
-        let res: any
-          res = await createSpec(data)
-        if (res.code === 0) {
-          if(type == 1){
-            dynamicTags.value.push({
-              spec_name: name,
-              id: res.data.id
-            })
-            tagInput.value = ''
-          }else if(type == 2){
-            dynamicTags2.value.push({
-              spec_name: name,
-              id: res.data.id
-            })
-            tagInput2.value = ''
-          }
-        } else {
-          ElMessage.error(res.message || '操作失败')
-        }
-      } catch (error: any) {
-        console.error('提交失败:', error)
-        ElMessage.error(error.response?.data?.message || '操作失败')
+          id: res.data.id
+        })
+        tagInput.value = ''
+      } else if (type == 2) {
+        dynamicTags2.value.push({
+          spec_name: name,
+          id: res.data.id
+        })
+        tagInput2.value = ''
       }
-   
+    } else {
+      ElMessage.error(res.message || '操作失败')
+    }
+  } catch (error: any) {
+    console.error('提交失败:', error)
+    ElMessage.error(error.response?.data?.message || '操作失败')
+  }
+
 }
 // 删除规格
-const handleDeleteaddtabInfo = async (row: any,type:any) => {
+const handleDeleteaddtabInfo = async (row: any, type: any) => {
   try {
     const res: any = await deleteSpec(row.id)
     if (res.code === 0) {
-      if(type == 1){
+      if (type == 1) {
         dynamicTags.value.splice(dynamicTags.value.indexOf(row), 1)
-      }else if(type == 2){
+      } else if (type == 2) {
         dynamicTags2.value.splice(dynamicTags2.value.indexOf(row), 1)
       }
       ElMessage.success('删除成功')
       // 检查当前页是否为空，如果为空且不是第一页，则跳转到上一页
-     
+
     } else {
       ElMessage.error(res.message || '删除失败')
     }
   } catch (error: any) {
-   
+
   }
 }
 const getgoodtypelist = () => {
   optionList.value = []
   form_Money.value.systemdetil = ''
-    console.log(tableData.value);
-    let arr: any[] = []
-    if(form_Money.value.typecg === '1'){
-      for(let y of tableData.value){
-        arr.push(y.parentName)
-      }
-    }else if(form_Money.value.typecg === '2'){
-       for(let y of tableData.value){
-        arr.push(y.childName)
-      }
+  console.log(tableData.value);
+  let arr: any[] = []
+  if (form_Money.value.typecg === '1') {
+    for (let y of tableData.value) {
+      arr.push(y.parentName)
     }
-    optionList.value = [...new Set(arr)]
-     console.log(optionList.value);
+  } else if (form_Money.value.typecg === '2') {
+    for (let y of tableData.value) {
+      arr.push(y.childName)
+    }
+  }
+  optionList.value = [...new Set(arr)]
+  console.log(optionList.value);
 }
 const uploadImageFile = async (file: File): Promise<string> => {
   try {
@@ -512,31 +452,31 @@ const uploadImageFile = async (file: File): Promise<string> => {
   }
 }
 const Submitchangt = () => {
-  if(form_Money.value.typecg === '1'){
+  if (form_Money.value.typecg === '1') {
     tableData.value.forEach((item) => {
-      if(item.parentName === form_Money.value.systemdetil){
-        if(form_Money.value.type === '1'){
+      if (item.parentName === form_Money.value.systemdetil) {
+        if (form_Money.value.type === '1') {
           item.price = form_Money.value.monynum
-        }else if(form_Money.value.type === '2'){
+        } else if (form_Money.value.type === '2') {
           item.stock = form_Money.value.monynum
         }
       }
     })
-  }else if(form_Money.value.typecg === '2'){
-     tableData.value.forEach((item) => {
-      if(item.childName === form_Money.value.systemdetil){
-        if(form_Money.value.type === '1'){
+  } else if (form_Money.value.typecg === '2') {
+    tableData.value.forEach((item) => {
+      if (item.childName === form_Money.value.systemdetil) {
+        if (form_Money.value.type === '1') {
           item.price = form_Money.value.monynum
-        }else if(form_Money.value.type === '2'){
+        } else if (form_Money.value.type === '2') {
           item.stock = form_Money.value.monynum
         }
       }
     })
   }
   dialogVisible_Money.value = false
-} 
+}
 const opendio = () => {
-  if(tableData.value.length === 0){
+  if (tableData.value.length === 0) {
     ElMessage.warning('请先配置规格')
     return
   }
@@ -552,7 +492,8 @@ const tabTypeimg = async (file: UploadFile, _index: number, row: any) => {
   }
 
   try {
-    const url = await uploadImageFile(file.raw as File)
+    const compressedFile = await compressImage(file.raw as File)
+    const url = await uploadImageFile(compressedFile)
     row.typeimg = url
   } catch (error) {
     // 错误信息已在 uploadImageFile 中处理
@@ -602,21 +543,21 @@ const handleDeleteSpec = async (row: any) => {
 const SubmitType = async () => {
   let goodObj = []
   let goodObj2 = []
-  for(let y of dynamicTags2.value){
-    goodObj.push({name:y.spec_name,children:[]})
+  for (let y of dynamicTags2.value) {
+    goodObj.push({ name: y.spec_name, children: [] })
   }
-  for(let k of dynamicTags.value){
-        goodObj2.push({name:k.spec_name})
+  for (let k of dynamicTags.value) {
+    goodObj2.push({ name: k.spec_name })
   }
-  for(let g of goodObj){
-      g.children =goodObj2
+  for (let g of goodObj) {
+    g.children = goodObj2
   }
   console.log(goodObj);
 
   // 将层级数据扁平化供表格使用，保持响应式
   const flatData: any[] = []
   goodObj.forEach((parent: any) => {
-    if(parent.children && parent.children.length > 0){
+    if (parent.children && parent.children.length > 0) {
       parent.children.forEach((child: any) => {
         flatData.push({
           parentName: parent.name,
@@ -630,14 +571,14 @@ const SubmitType = async () => {
   })
 
   // 重建对象以确保响应式
-  tableData.value = flatData.map(item => ({
+ let arrs= flatData.map(item => ({
     parentName: item.parentName,
     childName: item.childName,
     price: item.price,
     stock: item.stock,
     typeimg: item.typeimg,
   }))
-
+   tableData.value =tableData.value.concat(arrs)
   dialogVisible_type.value = false
   console.log('扁平化后的响应式表格数据:', tableData.value)
 }
@@ -719,7 +660,7 @@ const form = reactive<Goods>({
   is_recommend: 0,
   created_at: '',
   spec_ids: '',
-  sku_list:''
+  sku_list: ''
 })
 
 const rules: FormRules = {
@@ -800,10 +741,10 @@ const handleAdd = () => {
   console.log('=== 点击添加商品 ===')
   console.log('form数据:', form)
   console.log('tableData:', tableData.value)
-  form_type.value ={
-  colortype:[],
-  ggcm:[]
-}
+  form_type.value = {
+    colortype: [],
+    ggcm: []
+  }
   dialogVisible.value = true
 }
 
@@ -911,7 +852,7 @@ const handleDetailImageChange = async (file: UploadFile, index: number) => {
     const fieldName = `images${index + 1}` as keyof typeof form
     const compressedFile = await compressImage(file.raw as File)
     const url = await uploadImageFile(compressedFile)
-    ;(form as any)[fieldName] = url
+      ; (form as any)[fieldName] = url
   } catch (error) {
     // 错误信息已在 uploadImageFile 中处理
   }
@@ -920,7 +861,7 @@ const handleDetailImageChange = async (file: UploadFile, index: number) => {
 // 删除详情图
 const removeDetailImage = (index: number) => {
   const fieldName = `images${index + 1}` as keyof typeof form
-  ;(form as any)[fieldName] = ''
+    ; (form as any)[fieldName] = ''
 }
 
 // 获取详情图URL的辅助函数
@@ -985,8 +926,7 @@ const handleDialogClose = () => {
 </script>
 
 <style scoped>
-.goods {
-}
+.goods {}
 
 .card-header {
   display: flex;
