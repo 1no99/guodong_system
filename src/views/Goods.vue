@@ -170,23 +170,23 @@
     <el-dialog :close-on-click-modal="false" v-model="dialogVisible_type" title="规格配置" width="700px">
       <h3 >规格尺码 </h3>
       <div style="margin: 10px 0;">
-        <el-tag size="large" v-for="tag of dynamicTags2" :key="tag" closable style="margin: 10px 10px 0 0px;"
-          :disable-transitions="false" @close="handleClose(tag, 2)">
-          {{ tag.spec_name }}
-        </el-tag>
-      </div>
-      <div> <el-input v-model="tagInput2" style="width: 400px" clearable placeholder="请输入颜色类型（支持批量填写如：红色, 蓝色, 绿色）" />
-        <el-button style="margin-left: 10px;" type="primary" @click="addtabInfo(2)">确定</el-button>
-      </div>
-      <h3 style="margin-top: 10px;">颜色类型</h3>
-      <div style="margin: 10px 0;">
         <el-tag size="large" v-for="tag of dynamicTags" :key="tag" closable style="margin: 10px 10px 0 0px;"
           :disable-transitions="false" @close="handleClose(tag, 1)">
           {{ tag.spec_name }}
         </el-tag>
       </div>
-      <div> <el-input v-model="tagInput" style="width: 400px" clearable placeholder="请输入规格尺码（支持批量填写如：S, M, L）" />
+      <div> <el-input v-model="tagInput" style="width: 400px" clearable placeholder="请输入规格尺码（支持批量填写如：红色, 蓝色, 绿色）" />
         <el-button style="margin-left: 10px;" type="primary" @click="addtabInfo(1)">确定</el-button>
+      </div>
+      <h3 style="margin-top: 10px;">颜色类型</h3>
+      <div style="margin: 10px 0;">
+        <el-tag size="large" v-for="tag of dynamicTags2" :key="tag" closable style="margin: 10px 10px 0 0px;"
+          :disable-transitions="false" @close="handleClose(tag, 2)">
+          {{ tag.spec_name }}
+        </el-tag>
+      </div>
+      <div> <el-input v-model="tagInput2" style="width: 400px" clearable placeholder="请输入颜色类型（支持批量填写如：S, M, L）" />
+        <el-button style="margin-left: 10px;" type="primary" @click="addtabInfo(2)">确定</el-button>
       </div>
       <!-- <el-select v-model="form_type.ggcm" filterable placeholder="请选择分类" clearable multiple>
             <el-option :label="value.spec_name" :value="value.spec_name"  v-for="value in specList" />

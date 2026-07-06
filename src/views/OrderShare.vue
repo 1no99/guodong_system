@@ -30,8 +30,9 @@
             <div style="width: 25%;cursor: pointer;" @click="openPreview(item.product_image)">
               <img :src="item.product_image" :alt="item.product_name" style="width: 4rem; height: 4rem; object-fit: cover;"></div>
           <div class="item-top" style="width: 50%;">
-            <div class="item-name">名称：{{ item.product_name }}</div>
+            <div class="item-name">{{ item.product_name }}</div>
             <div v-if="item.sku_name" class="item-sku">规格：{{ item.sku_name }}</div>
+            <div v-if="item.quantity" class="item-sku">数量：{{ item.quantity }}</div>
           </div>
           <div style="width: 25%;" class="item-bottom">
             <div style="height: 2rem;background-color: #4099ef;padding: 10px;line-height: 0.8rem;
@@ -53,10 +54,12 @@
         </div>
         <div v-if="pickedItems.length === 0" class="empty-hint">暂无已拣货商品</div>
         <div v-for="(item, idx) in pickedItems" :key="'pick-' + idx" class="pick-item picked" style="display: flex;">
-          <div style="width: 25%;cursor: pointer;" @click="openPreview(item.spec_type_image)"><img :src="item.spec_type_image" :alt="item.product_name" style="width: 4rem; height: 4rem; object-fit: cover;"></div>
+          <div style="width: 25%;cursor: pointer;" @click="openPreview(item.spec_type_image)">
+            <img :src="item.product_image" :alt="item.product_name" style="width: 4rem; height: 4rem; object-fit: cover;"></div>
           <div class="item-top" style="width: 50%;">
-            <div class="item-name">名称：{{ item.product_name }}</div>
+            <div class="item-name">{{ item.product_name }}</div>
             <div v-if="item.sku_name" class="item-sku">规格：{{ item.sku_name }}</div>
+            <div v-if="item.quantity" class="item-sku">数量：{{ item.quantity }}</div>
           </div>
           <div style="width: 25%;" class="item-bottom">
             <div style="height: 2rem;background-color: #ccc;padding: 10px;line-height: 0.8rem;
@@ -253,10 +256,11 @@ onMounted(async () => {
 }
 .item-name {
   font-weight: 500;
+  font-size: 18px;
   flex: 1;
 }
 .item-sku {
-  font-size: 12px;
+  font-size: 14px;
   color: #999;
 }
 
