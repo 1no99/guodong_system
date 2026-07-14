@@ -163,10 +163,10 @@ const timeForm = reactive({
 
 // 统计数据
 const statistics = ref([
-  { title: '总订单数', value: 0, key: 'total_orders', icon: 'Document', color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+  { title: '完成订单数', value: 0, key: 'total_orders', icon: 'Document', color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
   { title: '总用户数', value: 0, key: 'total_users', icon: 'User', color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
   { title: '商品数量', value: 0, key: 'total_products', icon: 'Goods', color: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
-  { title: '总销售额', value: 0, key: 'total_sales', icon: 'Money', color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }
+  { title: '总销售额（已发货）', value: 0, key: 'total_sales', icon: 'Money', color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }
 ])
 
 // 待处理订单

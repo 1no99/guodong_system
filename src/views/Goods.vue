@@ -143,7 +143,8 @@
             </el-table-column>
             <el-table-column prop="typeimg" label="花色图">
               <template #default="{ row }">
-                <el-upload style="width: 50px;height: 50px;border: 1px solid #ccc;
+               <div style="display: flex;align-items: center;justify-content: space-between;">
+                <div> <el-upload style="width: 50px;height: 50px;border: 1px solid #ccc;
                     text-align: center;line-height: 50px;cursor: pointer;border-radius: 10px;" action="#"
                   :show-file-list="false" :auto-upload="false"
                   :on-change="(file: UploadFile) => tabTypeimg(file, 0, row)">
@@ -151,7 +152,11 @@
                   <el-icon v-else>
                     <Plus />
                   </el-icon>
-                </el-upload>
+                </el-upload></div>
+                <div>
+                  <el-icon :size="20" :color="colornum == row.typeimg?'red':''" @click="viewImage(row.typeimg)"><Search /></el-icon>
+                </div>
+               </div>
               </template>
             </el-table-column>
             <el-table-column prop="" label="操作" width="100">
@@ -230,6 +235,9 @@
         <el-button type="primary" @click="Submitchangt">确定</el-button>
       </template>
     </el-dialog>
+    <!-- 图片预览 -->
+    <el-image-viewer v-if="previewVisible" :url-list="[previewImageUrl]" :initial-index="0"
+      @close="previewVisible = false" />
   </div>
 </template>
 
@@ -245,6 +253,7 @@ import {
   createSpec,
   deleteSpec
 } from '@/api/productSpec'
+let colornum = ref('')
 interface Goods {
   id?: number
   category_id: number
@@ -492,6 +501,7 @@ const tabTypeimg = async (file: UploadFile, _index: number, row: any) => {
   }
 
   try {
+   
     const compressedFile = await compressImage(file.raw as File)
     const url = await uploadImageFile(compressedFile)
     row.typeimg = url
@@ -923,10 +933,40 @@ const handleSubmit = async () => {
 const handleDialogClose = () => {
   formRef.value?.resetFields()
 }
+
+// 图片预览
+const previewVisible = ref(false)
+const previewImageUrl = ref('')
+
+const viewImage = (url: string) => {
+  if (!url) {
+    ElMessage.warning('暂无图片')
+    return
+  }
+   colornum.value = url
+  previewImageUrl.value = url
+  previewVisible.value = true
+}
 </script>
 
 <style scoped>
-.goods {}
+:deep(.el-image-viewer__wrapper) {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 25% !important;
+  right: 0;
+  width: 30% !important;
+}
+
+/* :deep(.el-image-viewer__mask) {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100% !important;
+} */
 
 .card-header {
   display: flex;

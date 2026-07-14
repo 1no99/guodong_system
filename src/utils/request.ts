@@ -111,7 +111,12 @@ request.interceptors.response.use(
     return res
   },
   error => {
-    console.error('请求错误:', error)
+    console.error('请求错误:', error.status)
+     if ( error.status == 401) {
+        const userStore = useUserStore()
+        userStore.logout()
+        window.location.href = '/login'
+      }
     ElMessage.error(error.message || '网络错误')
     return Promise.reject(error)
   }

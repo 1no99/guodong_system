@@ -146,7 +146,11 @@
           <el-table-column prop="quantity" label="数量" width="100" />
           <el-table-column prop="total_price" label="合计" width="100" />
         </el-table>
-        <div style="margin-top: 10px;font-size: 16px;font-weight: 600;">订单总金额金额：{{ currentOrder?.total_amount }}</div>
+        <div style="display: flex;justify-content: space-between;">
+           <div style="margin-top: 10px;font-size: 16px;font-weight: 600;width: 67%;">订单总金额金额：{{ currentOrder?.total_amount }}</div>
+            <div style="margin-top: 10px;font-size: 16px;font-weight: 600;width: 33%;">订单总数量：{{ currentOrder?.total_quantity }}</div>
+        </div>
+       
       </div>
       <template #footer>
         <el-button type="primary" @click="handlePrint">打印</el-button>
@@ -485,9 +489,14 @@ const handleReset = () => {
 
 const handleView = async (row: Order) => {
   try {
+    let quantityTotal = 0
     const res: any = await getOrderDetail(row.id)
     if (res.code === 0) {
+      for(let u of res.data.items){
+        quantityTotal += u.quantity 
+      } 
       currentOrder.value = res.data
+      currentOrder.value.total_quantity = quantityTotal
       detailDialogVisible.value = true
     }
   } catch (error) {
