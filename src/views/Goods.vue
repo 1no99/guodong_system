@@ -37,18 +37,22 @@
       </el-form>
 
       <el-table :data="goodsList" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
         <el-table-column label="商品图片" width="100">
           <template #default="{ row }">
             <el-image :src="getImageUrl(row.main_image)" fit="cover"
               style="width: 60px; height: 60px; border-radius: 4px;" />
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="商品名称" />
+        <el-table-column prop="name" label="商品名称" width="220" />
         <el-table-column prop="subtitle" label="副标题" show-overflow-tooltip />
         <el-table-column label="分类" width="120">
           <template #default="{ row }">
             {{ getCategoryName(row.category_id) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="排序(数字越大越靠前)" width="200">
+          <template #default="{ row }">
+            <el-input-number style="width: 100px;" v-model="row.sort_order" :min="0" :max="10" @change="handleChange(row)" />
           </template>
         </el-table-column>
         <!-- <el-table-column label="规格" width="200">
@@ -79,10 +83,12 @@
     </el-card>
 
     <!-- 添加/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :close-on-click-modal="false" :title="dialogTitle" width="1100px" top="5vh"
+    <el-dialog v-model="dialogVisible" :close-on-click-modal="false" :title="dialogTitle" width="1700px" top="5vh"
       @close="handleDialogClose">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
-        <el-form-item label="商品名称" prop="name">
+        <div style="display: flex;flex-direction: row;justify-content: space-between;"> 
+          <div style="width: 35%;">
+              <el-form-item label="商品名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商品名称" />
         </el-form-item>
         <el-form-item label="副标题" prop="subtitle">
@@ -122,13 +128,14 @@
             </div>
           </div>
         </el-form-item>
-
-        <el-form-item label="商品规格" prop="spec_ids">
+          </div>
+          <div style="width: 75%;">
+              <el-form-item label="商品规格" prop="spec_ids">
           <el-button type="primary" @click="dialogVisible_type = true,dynamicTags2 = [],dynamicTags = []">配置规格</el-button>
           <el-button type="primary" @click="opendio">一键配置（价格/库存）</el-button>
         </el-form-item>
         <el-form-item label="商品规格" prop="spec_ids">
-          <el-table :data="tableData" style="width: 100%" border :span-method="spanMethod">
+          <el-table :data="tableData" style="width: 100%" border height="600" :span-method="spanMethod">
             <el-table-column prop="parentName" label="颜色类型" />
             <el-table-column prop="childName" label="规格尺码" />
             <el-table-column prop="price" label="价格">
@@ -166,6 +173,12 @@
             </el-table-column>
           </el-table>
         </el-form-item>
+
+          </div>
+        </div>
+      
+
+      
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -786,6 +799,7 @@ const handleEdit = async (row: Goods) => {
       childName: item.childName || '',
       price: item.price || 0,
       stock: item.stock || 0,
+      id: item.id || '',
       typeimg: item.typeimg || ''
     }))
   } else if (form.spec_ids && typeof form.spec_ids === 'string') {
@@ -801,6 +815,7 @@ const handleEdit = async (row: Goods) => {
           childName: item.childName || '',
           price: item.price || 0,
           stock: item.stock || 0,
+          id: item.id || '',
           typeimg: item.typeimg || ''
         }))
       } else {
@@ -929,6 +944,28 @@ const handleSubmit = async () => {
     }
   })
 }
+const handleChange = async (value: any) => {
+  console.log('Selected value:', value)
+  // 只提交需要的字段
+        const data = {
+          sort_order: value.sort_order
+        }
+
+        console.log('提交的商品数据:', data, '商品ID:', value.id)
+        // return false
+        let res: any
+        loading.value = true
+          res = await updateProduct(value.id, data)
+         if (res.code === 0) {
+          ElMessage.success('编辑成功')
+          loading.value = false
+          dialogVisible.value = false
+          loadGoodsList()
+        } else {
+          loading.value = false
+          ElMessage.error(res.message || '操作失败')
+        }
+}
 
 const handleDialogClose = () => {
   formRef.value?.resetFields()
@@ -954,7 +991,7 @@ const viewImage = (url: string) => {
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 25% !important;
+  left: 45% !important;
   right: 0;
   width: 30% !important;
 }
@@ -998,8 +1035,8 @@ const viewImage = (url: string) => {
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 178px;
-  height: 178px;
+  width: 100px;
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
