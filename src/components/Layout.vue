@@ -99,7 +99,7 @@ const menuList = [
   { path: '/goodsType', meta: { title: '商品分类管理', icon: 'Location' } },
   { path: '/productSpec', meta: { title: '商品规格配置', icon: 'Setting' } },
   { path: '/orders', meta: { title: '订单管理', icon: 'Document' } },
-  { path: '/users', meta: { title: '用户管理', icon: 'User' } },
+  // { path: '/users', meta: { title: '用户管理', icon: 'User' } },
   // { path: '/address', meta: { title: '地址管理', icon: 'Location' } }
 ]
 

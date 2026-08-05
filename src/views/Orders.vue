@@ -35,9 +35,9 @@
       </el-form>
 
       <el-table :data="orderList" v-loading="loading" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80" />
+        <!-- <el-table-column prop="id" label="ID" width="80" /> -->
         <el-table-column prop="order_no" label="订单号" width="180" />
-        <el-table-column label="商品信息" min-width="200">
+        <el-table-column label="商品信息" min-width="200" show-overflow-tooltip>
           <template #default="{ row }">
             <div v-if="row.items && row.items.length > 0">
               <div v-if="row.total_items > 2" >
@@ -52,12 +52,17 @@
           </template>
         </el-table-column>
           <el-table-column prop="user_phone" label="下单用户电话" width="120" />
-          <el-table-column prop="userInfo.username" label="下单微信名称" width="120" />
+          <el-table-column prop="userInfo.username" label="下单微信名称" width="120" show-overflow-tooltip />
         <el-table-column prop="user_id" label="下单用户编号" width="120">
             <template #default="{ row }">
-              {{ row.user_id?row.user_id:row.user_phone.substring(6,11) }}
+              {{ row.user_phone.substring(6,11) }}
           </template>
         </el-table-column>
+         <el-table-column prop="userInfo.username" label="物流单号" width="220" >
+         <template #default="{ row }">
+             <span>{{  row.express_company }}-{{  row.express_no }}</span>
+          </template>
+          </el-table-column>
         <el-table-column prop="total_amount" label="订单总金额" width="100">
           <template #default="{ row }">
             ¥{{ parseFloat(row.total_amount).toFixed(2) }}
@@ -98,7 +103,7 @@
             <el-button
               type="danger"
               size="small"
-              v-if="row.order_status != 4"
+              v-if="row.order_status === 0 || row.order_status === 1"
               @click="updateOrderStatusFun(row.id, 4  )"
             >
               取消订单
