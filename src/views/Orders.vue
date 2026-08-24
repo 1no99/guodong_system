@@ -130,6 +130,7 @@
       v-model="detailDialogVisible"
       title="订单详情"
       width="900px"
+      top="5vh"
     >
       <div id="printArea">
         <el-descriptions :column="2" border v-if="currentOrder">
@@ -139,8 +140,14 @@
           <el-descriptions-item label="收货人电话">{{ currentOrder.receiver_phone }}</el-descriptions-item>
           <el-descriptions-item label="收货地址">{{ currentOrder.receiver_address }}</el-descriptions-item>
         </el-descriptions>
+         <div style="display: flex;justify-content: space-between;color: red;">
+           <div style="margin-top: 10px;font-size: 16px;font-weight: 600;width: 67%;">订单总金额金额：{{ currentOrder?.total_amount }}</div>
+           <div v-if="parseFloat(currentOrder?.total_amount) === 0" style="margin-top: 10px;font-size: 16px;font-weight: 600;color: #e6a23c;width: 67%;">订单金额出现合计出现0元，请核对订单</div>
+            <div style="margin-top: 10px;font-size: 16px;font-weight: 600;width: 33%;">订单总数量：{{ currentOrder?.total_quantity }}</div>
+
+        </div>
         <div style="font-size: 16px;font-weight: 600;margin: 10px 0;">销售明细</div>
-        <el-table :data="currentOrder?.items" v-loading="loading" style="width: 100%">
+        <el-table :data="currentOrder?.items" v-loading="loading" style="width: 100%" height="400">
           <el-table-column prop="product_name" label="商品名称" />
           <el-table-column prop="sku_name" label="型号" />
           <el-table-column prop="price" label="单价" width="100">
@@ -151,10 +158,7 @@
           <el-table-column prop="quantity" label="数量" width="100" />
           <el-table-column prop="total_price" label="合计" width="100" />
         </el-table>
-        <div style="display: flex;justify-content: space-between;">
-           <div style="margin-top: 10px;font-size: 16px;font-weight: 600;width: 67%;">订单总金额金额：{{ currentOrder?.total_amount }}</div>
-            <div style="margin-top: 10px;font-size: 16px;font-weight: 600;width: 33%;">订单总数量：{{ currentOrder?.total_quantity }}</div>
-        </div>
+       
        
       </div>
       <template #footer>
