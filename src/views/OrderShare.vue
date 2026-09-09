@@ -31,8 +31,8 @@
               <img :src="item.product_image" :alt="item.product_name" style="width: 4rem; height: 4rem; object-fit: cover;"></div>
           <div class="item-top" style="width: 50%;">
             <div class="item-name">{{ item.product_name }}</div>
-            <div v-if="item.sku_name" class="item-sku">规格：{{ item.sku_name }}</div>
-            <div v-if="item.quantity" class="item-sku">数量：{{ item.quantity }}</div>
+            <div v-if="item.sku_name" class="item-sku" >规格：{{ item.sku_name }}</div>
+            <div v-if="item.quantity" class="item-sku" style="font-size: 1.2rem;color: #ff4d4f;">数量：{{ item.quantity }}</div>
           </div>
           <div style="width: 25%;" class="item-bottom">
             <div style="height: 2rem;background-color: #4099ef;padding: 10px;line-height: 0.8rem;
@@ -59,7 +59,7 @@
           <div class="item-top" style="width: 50%;">
             <div class="item-name">{{ item.product_name }}</div>
             <div v-if="item.sku_name" class="item-sku">规格：{{ item.sku_name }}</div>
-            <div v-if="item.quantity" class="item-sku">数量：{{ item.quantity }}</div>
+            <div v-if="item.quantity" class="item-sku" style="font-size: 1.2rem;color: #ff4d4f;">数量：{{ item.quantity }}</div>
           </div>
           <div style="width: 25%;" class="item-bottom">
             <div style="height: 2rem;background-color: #ccc;padding: 10px;line-height: 0.8rem;
