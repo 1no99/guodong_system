@@ -44,6 +44,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="name" label="商品名称" width="220" />
+        <el-table-column prop="id" label="商品ID" width="220" />
         <el-table-column prop="subtitle" label="副标题" show-overflow-tooltip />
         <el-table-column label="分类" width="120">
           <template #default="{ row }">
@@ -52,7 +53,8 @@
         </el-table-column>
         <el-table-column label="排序(数字越大越靠前)" width="200">
           <template #default="{ row }">
-            <el-input-number style="width: 100px;" v-model="row.sort_order" :min="0" :max="10" @change="handleChange(row)" />
+            <el-input-number style="width: 100px;" v-model="row.sort_order" :min="0" :max="10"
+              @change="handleChange(row)" />
           </template>
         </el-table-column>
         <!-- <el-table-column label="规格" width="200">
@@ -86,99 +88,107 @@
     <el-dialog v-model="dialogVisible" :close-on-click-modal="false" :title="dialogTitle" width="1700px" top="5vh"
       @close="handleDialogClose">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
-        <div style="display: flex;flex-direction: row;justify-content: space-between;"> 
+        <div style="display: flex;flex-direction: row;justify-content: space-between;">
           <div style="width: 35%;">
-              <el-form-item label="商品名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入商品名称" />
-        </el-form-item>
-        <el-form-item label="副标题" prop="subtitle">
-          <el-input v-model="form.subtitle" placeholder="请输入副标题" />
-        </el-form-item>
-        <el-form-item label="分类" prop="category_id">
-          <el-select v-model="form.category_id" placeholder="请选择分类" style="width: 100%;">
-            <el-option label="请选择分类" :value="0" />
-            <el-option v-for="cat in categoryList" :key="cat.id" :label="cat.name" :value="cat.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="商品主图" prop="main_image">
-          <el-upload class="avatar-uploader" action="#" :show-file-list="false" :auto-upload="false"
-            :on-change="handleImageChange">
-            <img v-if="form.main_image" :src="getImageUrl(form.main_image)" class="avatar" />
-            <el-icon v-else class="avatar-uploader-icon">
-              <Plus />
-            </el-icon>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="商品详情图">
-          <div class="detail-images-uploader">
-            <div v-for="(_image, index) in 5" :key="index" class="image-upload-item">
+            <el-form-item label="商品名称" prop="name">
+              <el-input v-model="form.name" placeholder="请输入商品名称" />
+            </el-form-item>
+            <el-form-item label="副标题" prop="subtitle">
+              <el-input v-model="form.subtitle" placeholder="请输入副标题" />
+            </el-form-item>
+            <el-form-item label="分类" prop="category_id">
+              <el-select v-model="form.category_id" placeholder="请选择分类" style="width: 100%;">
+                <el-option label="请选择分类" :value="0" />
+                <el-option v-for="cat in categoryList" :key="cat.id" :label="cat.name" :value="cat.id" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="商品主图" prop="main_image">
               <el-upload class="avatar-uploader" action="#" :show-file-list="false" :auto-upload="false"
-                :on-change="(file: UploadFile) => handleDetailImageChange(file, index)">
-                <img v-if="getDetailImageUrl(index)" :src="getImageUrl(getDetailImageUrl(index))"
-                  class="detail-avatar" />
+                :on-change="handleImageChange">
+                <img v-if="form.main_image" :src="getImageUrl(form.main_image)" class="avatar" />
                 <el-icon v-else class="avatar-uploader-icon">
                   <Plus />
                 </el-icon>
               </el-upload>
-              <div class="image-label">图片{{ index + 1 }}</div>
-              <el-button v-if="getDetailImageUrl(index)" type="danger" size="small" @click="removeDetailImage(index)"
-                style="margin-top: 4px">
-                删除
-              </el-button>
-            </div>
-          </div>
-        </el-form-item>
+            </el-form-item>
+            <el-form-item label="商品详情图">
+              <div class="detail-images-uploader">
+                <div v-for="(_image, index) in 5" :key="index" class="image-upload-item">
+                  <el-upload class="avatar-uploader" action="#" :show-file-list="false" :auto-upload="false"
+                    :on-change="(file: UploadFile) => handleDetailImageChange(file, index)">
+                    <img v-if="getDetailImageUrl(index)" :src="getImageUrl(getDetailImageUrl(index))"
+                      class="detail-avatar" />
+                    <el-icon v-else class="avatar-uploader-icon">
+                      <Plus />
+                    </el-icon>
+                  </el-upload>
+                  <div class="image-label">图片{{ index + 1 }}</div>
+                  <el-button v-if="getDetailImageUrl(index)" type="danger" size="small"
+                    @click="removeDetailImage(index)" style="margin-top: 4px">
+                    删除
+                  </el-button>
+                </div>
+              </div>
+            </el-form-item>
           </div>
           <div style="width: 75%;">
-              <el-form-item label="商品规格" prop="spec_ids">
-          <el-button type="primary" @click="dialogVisible_type = true,dynamicTags2 = [],dynamicTags = []">配置规格</el-button>
-          <el-button type="primary" @click="opendio">一键配置（价格/库存）</el-button>
-        </el-form-item>
-        <el-form-item label="商品规格" prop="spec_ids">
-          <el-table :data="tableData" style="width: 100%" border height="600" :span-method="spanMethod">
-            <el-table-column prop="parentName" label="颜色类型" />
-            <el-table-column prop="childName" label="规格尺码" />
-            <el-table-column prop="price" label="价格">
-              <template #default="{ row }">
-                <el-input v-model="row.price" placeholder="请输入价格" />
-              </template>
-            </el-table-column>
-            <el-table-column prop="stock" label="库存">
-              <template #default="{ row }">
-                <el-input v-model="row.stock" placeholder="请输入库存" />
-              </template>
-            </el-table-column>
-            <el-table-column prop="typeimg" label="花色图">
-              <template #default="{ row }">
-               <div style="display: flex;align-items: center;justify-content: space-between;">
-                <div> <el-upload style="width: 50px;height: 50px;border: 1px solid #ccc;
+            <el-form-item label="商品规格" prop="spec_ids">
+              <el-button type="primary"
+                @click="openChildDialog()">配置规格</el-button>
+              <el-button type="primary" @click="opendio">一键配置（价格/库存）</el-button>
+            </el-form-item>
+            <el-form-item label="商品规格" prop="spec_ids">
+              <el-table :data="tableData" style="width: 100%" border height="600" :span-method="spanMethod">
+                <el-table-column prop="parentName" label="颜色类型" />
+                <el-table-column prop="childName" label="规格尺码(规格编号)">
+                  <template #default="{ row }">
+                    {{ row.childName }} <div style="color: #ccc;">(ID: {{ row.id }})</div>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="price" label="价格">
+                  <template #default="{ row }">
+                    <el-input v-model="row.price" placeholder="请输入价格" />
+                  </template>
+                </el-table-column>
+                <el-table-column prop="stock" label="库存">
+                  <template #default="{ row }">
+                    <el-input v-model="row.stock" placeholder="请输入库存" />
+                  </template>
+                </el-table-column>
+                <el-table-column prop="typeimg" label="花色图">
+                  <template #default="{ row }">
+                    <div style="display: flex;align-items: center;justify-content: space-between;">
+                      <div> <el-upload style="width: 50px;height: 50px;border: 1px solid #ccc;
                     text-align: center;line-height: 50px;cursor: pointer;border-radius: 10px;" action="#"
-                  :show-file-list="false" :auto-upload="false"
-                  :on-change="(file: UploadFile) => tabTypeimg(file, 0, row)">
-                  <img v-if="row.typeimg" :src="getImageUrl(row.typeimg)" class="avatar" />
-                  <el-icon v-else>
-                    <Plus />
-                  </el-icon>
-                </el-upload></div>
-                <div>
-                  <el-icon :size="20" :color="colornum == row.typeimg?'red':''" @click="viewImage(row.typeimg)"><Search /></el-icon>
-                </div>
-               </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="" label="操作" width="100">
-              <template #default="{ row }">
-                <el-button type="danger" @click="handleDeleteSpec(row)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-form-item>
+                          :show-file-list="false" :auto-upload="false"
+                          :on-change="(file: UploadFile) => tabTypeimg(file, 0, row)">
+                          <img v-if="row.typeimg" :src="getImageUrl(row.typeimg)" class="avatar" />
+                          <el-icon v-else>
+                            <Plus />
+                          </el-icon>
+                        </el-upload></div>
+                      <div>
+                        <el-icon :size="20" :color="colornum == row.typeimg ? 'red' : ''"
+                          @click="viewImage(row.typeimg)">
+                          <Search />
+                        </el-icon>
+                      </div>
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="" label="操作" width="100">
+                  <template #default="{ row }">
+                    <el-button type="danger" @click="handleDeleteSpec(row)">删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-form-item>
 
           </div>
         </div>
-      
 
-      
+
+
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -186,38 +196,40 @@
       </template>
     </el-dialog>
     <el-dialog :close-on-click-modal="false" v-model="dialogVisible_type" title="规格配置" width="700px">
-      <h3 >规格尺码 </h3>
+      <h3>操作类型 </h3>
+      <div style="margin: 10px 0;">
+        <el-select v-model="gooschangType" :disabled="dialogTitle == '添加商品'" placeholder="请选择分类" style="width: 70%;">
+          <el-option label="新增颜色类型" :value="0" />
+          <el-option label="新增规格尺码" :value="1" />
+        </el-select>
+      </div>
+      <h3 v-if="gooschangType == 1">选择需要新增规格的颜色类型 </h3>
+      <el-select v-if="gooschangType == 1" v-model="changeFl" placeholder="请选择分类" style="width: 70%;margin: 10px 0;">
+        <el-option v-for="option of selectOptionData" :key="option" :label="option" :value="option" />
+      </el-select>
+      <h3>规格尺码 </h3>
       <div style="margin: 10px 0;">
         <el-tag size="large" v-for="tag of dynamicTags" :key="tag" closable style="margin: 10px 10px 0 0px;"
           :disable-transitions="false" @close="handleClose(tag, 1)">
           {{ tag.spec_name }}
         </el-tag>
       </div>
-      <div> <el-input v-model="tagInput" style="width: 400px" clearable placeholder="请输入规格尺码（支持批量填写如：红色, 蓝色, 绿色）" />
+      <div> <el-input v-model="tagInput" style="width: 70%" clearable placeholder="请输入规格尺码（支持批量填写如：红色, 蓝色, 绿色）" />
         <el-button style="margin-left: 10px;" type="primary" @click="addtabInfo(1)">确定</el-button>
       </div>
-      <h3 style="margin-top: 10px;">颜色类型</h3>
-      <div style="margin: 10px 0;">
+      <h3 v-if="gooschangType == 0" style="margin-top: 10px;">颜色类型</h3>
+      <div v-if="gooschangType == 0" style="margin: 10px 0;">
         <el-tag size="large" v-for="tag of dynamicTags2" :key="tag" closable style="margin: 10px 10px 0 0px;"
           :disable-transitions="false" @close="handleClose(tag, 2)">
           {{ tag.spec_name }}
         </el-tag>
       </div>
-      <div> <el-input v-model="tagInput2" style="width: 400px" clearable placeholder="请输入颜色类型（支持批量填写如：S, M, L）" />
+      <div v-if="gooschangType == 0"> <el-input v-model="tagInput2" style="width: 70%" clearable placeholder="请输入颜色类型（支持批量填写如：S, M, L）" />
         <el-button style="margin-left: 10px;" type="primary" @click="addtabInfo(2)">确定</el-button>
       </div>
-      <!-- <el-select v-model="form_type.ggcm" filterable placeholder="请选择分类" clearable multiple>
-            <el-option :label="value.spec_name" :value="value.spec_name"  v-for="value in specList" />
-          </el-select> -->
-
-
-      <!-- <el-select v-model="form_type.colortype" filterable placeholder="请选择分类" clearable multiple>
-            <el-option :label="value.spec_name" :value="value.spec_name"  v-for="value in specList" />
-          </el-select> -->
-
       <template #footer>
         <el-button @click="dialogVisible_type = false">取消</el-button>
-        <el-button type="primary" @click="SubmitType">确定</el-button>
+        <el-button type="primary" @click="SubmitType">提交</el-button>
       </template>
     </el-dialog>
     <el-dialog :close-on-click-modal="false" v-model="dialogVisible_Money" title="价格配置" width="700px">
@@ -266,7 +278,17 @@ import {
   createSpec,
   deleteSpec
 } from '@/api/productSpec'
+// 按 parentName 排序，保证 spanMethod 合并逻辑正确（同组连续）
+const sortTableByParentName = () => {
+  tableData.value.sort((a: any, b: any) => {
+    if (a.parentName < b.parentName) return -1
+    if (a.parentName > b.parentName) return 1
+    return 0
+  })
+}
+
 let colornum = ref('')
+const changeFl = ref('')
 interface Goods {
   id?: number
   category_id: number
@@ -306,6 +328,7 @@ interface TableDataItem {
 }
 const dialogVisible_Money = ref(false)
 const tableData = ref<TableDataItem[]>([])
+const gooschangType = ref(0)
 const form_Money = ref({
   type: '',
   typecg: '',
@@ -366,6 +389,18 @@ const dynamicTags = ref<any[]>([])
 const dynamicTags2 = ref<any[]>([])
 const tagInput2 = ref('')
 const tagInput = ref('')
+const selectOptionData =  ref<any[]>([])
+const openChildDialog = () => {
+  dynamicTags2.value = []
+  dynamicTags.value = []
+  dialogVisible_type.value = true
+  gooschangType.value = 0
+  let arr: any[] = []
+  for (const item of tableData.value) {
+      arr.push(item.parentName)
+  }
+  selectOptionData.value = [...new Set(arr)]
+}
 const handleClose = (tag: any, type: any) => {
   handleDeleteaddtabInfo(tag, type)
 
@@ -514,7 +549,7 @@ const tabTypeimg = async (file: UploadFile, _index: number, row: any) => {
   }
 
   try {
-   
+
     const compressedFile = await compressImage(file.raw as File)
     const url = await uploadImageFile(compressedFile)
     row.typeimg = url
@@ -564,6 +599,22 @@ const handleDeleteSpec = async (row: any) => {
   }
 }
 const SubmitType = async () => {
+  let oneOrTwo = []
+  console.log('dynamicTags:', gooschangType.value );
+  
+  if(gooschangType.value == 1){
+   dynamicTags.value.map((y: any) => {
+      console.log(12323);
+      oneOrTwo.push({
+        parentName: changeFl.value,
+        childName: y.spec_name,
+        price: 0,
+        stock: 9999,
+        typeimg: ''
+      })
+    })
+  }
+  console.log('dynamicTags2:', oneOrTwo)
   let goodObj = []
   let goodObj2 = []
   for (let y of dynamicTags2.value) {
@@ -575,8 +626,6 @@ const SubmitType = async () => {
   for (let g of goodObj) {
     g.children = goodObj2
   }
-  console.log(goodObj);
-
   // 将层级数据扁平化供表格使用，保持响应式
   const flatData: any[] = []
   goodObj.forEach((parent: any) => {
@@ -594,14 +643,21 @@ const SubmitType = async () => {
   })
 
   // 重建对象以确保响应式
- let arrs= flatData.map(item => ({
+  let arrs = flatData.map(item => ({
     parentName: item.parentName,
     childName: item.childName,
     price: item.price,
     stock: item.stock,
     typeimg: item.typeimg,
   }))
-   tableData.value =tableData.value.concat(arrs)
+ 
+  // 直接 push 到响应式数组，确保 Vue 3 能追踪变化并触发视图更新
+  const newItems = oneOrTwo.concat(arrs)
+  tableData.value.push(...newItems)
+
+  // 按 parentName 排序，保证 spanMethod 合并逻辑正确
+  sortTableByParentName()
+
   dialogVisible_type.value = false
   console.log('扁平化后的响应式表格数据:', tableData.value)
 }
@@ -806,7 +862,7 @@ const handleEdit = async (row: Goods) => {
     // 兼容旧数据（JSON字符串）
     try {
       let parsedData: any = JSON.parse(form.spec_ids)
-      if (typeof parsedData === 'string') {
+      if (typeof(parsedData) === 'string') {
         parsedData = JSON.parse(parsedData)
       }
       if (Array.isArray(parsedData)) {
@@ -828,6 +884,9 @@ const handleEdit = async (row: Goods) => {
   } else {
     tableData.value = []
   }
+
+  // 按 parentName 排序，保证 spanMethod 合并逻辑正确
+  sortTableByParentName()
 
   dialogVisible.value = true
 }
@@ -947,24 +1006,24 @@ const handleSubmit = async () => {
 const handleChange = async (value: any) => {
   console.log('Selected value:', value)
   // 只提交需要的字段
-        const data = {
-          sort_order: value.sort_order
-        }
+  const data = {
+    sort_order: value.sort_order
+  }
 
-        console.log('提交的商品数据:', data, '商品ID:', value.id)
-        // return false
-        let res: any
-        loading.value = true
-          res = await updateProduct(value.id, data)
-         if (res.code === 0) {
-          ElMessage.success('编辑成功')
-          loading.value = false
-          dialogVisible.value = false
-          loadGoodsList()
-        } else {
-          loading.value = false
-          ElMessage.error(res.message || '操作失败')
-        }
+  console.log('提交的商品数据:', data, '商品ID:', value.id)
+  // return false
+  let res: any
+  loading.value = true
+  res = await updateProduct(value.id, data)
+  if (res.code === 0) {
+    ElMessage.success('编辑成功')
+    loading.value = false
+    dialogVisible.value = false
+    loadGoodsList()
+  } else {
+    loading.value = false
+    ElMessage.error(res.message || '操作失败')
+  }
 }
 
 const handleDialogClose = () => {
@@ -980,7 +1039,7 @@ const viewImage = (url: string) => {
     ElMessage.warning('暂无图片')
     return
   }
-   colornum.value = url
+  colornum.value = url
   previewImageUrl.value = url
   previewVisible.value = true
 }

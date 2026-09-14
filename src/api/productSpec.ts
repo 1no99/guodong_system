@@ -86,3 +86,23 @@ export const deleteSpecValue = (id: number) => {
 export const linkProductSpecs = (productId: number, specIds: number[]) => {
   return request.post(`/product-spec/product/${productId}/link`, { spec_ids: specIds })
 }
+
+/**
+ * 获取型号分页列表（关联商品名称）
+ */
+export const getTypeList = (params: {
+  page?: number
+  pageSize?: number
+  product_id?: number | string
+  type_id?: number | string
+  type_name?: string
+}) => {
+  return request.get('/product-spec/type-list', { params })
+}
+
+/**
+ * 更新型号名称
+ */
+export const updateTypeName = (id: number, data: { childName: string }) => {
+  return request.put(`/product-spec/type/${id}`, data)
+}

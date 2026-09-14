@@ -3,19 +3,60 @@
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
-          <span>商品规格配置</span>
-          <el-button type="primary" @click="handleAdd">添加规格</el-button>
+          <span>商品型号管理</span>
         </div>
       </template>
 
-      <!-- 规格列表 -->
-      <el-table :data="specs" style="width: 100%" v-loading="loading">
-        <el-table-column type="index" label="序号" width="80" :index="indexMethod" />
-        <el-table-column prop="spec_name" label="规格名称" />
-        <el-table-column label="操作" width="180" fixed="right">
+      <!-- 筛选条件 -->
+      <el-form :inline="true" :model="searchForm" class="search-form">
+        <el-form-item label="商品ID">
+          <el-input v-model="searchForm.product_id" placeholder="请输入商品ID" clearable style="width: 160px;" />
+        </el-form-item>
+        <el-form-item label="型号ID">
+          <el-input v-model="searchForm.type_id" placeholder="请输入型号ID" clearable style="width: 160px;" />
+        </el-form-item>
+        <el-form-item label="型号名称">
+          <el-input v-model="searchForm.type_name" placeholder="请输入型号名称" clearable style="width: 180px;" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleSearch">
+            <el-icon><Search /></el-icon>
+            搜索
+          </el-button>
+          <el-button @click="handleReset">重置</el-button>
+        </el-form-item>
+      </el-form>
+
+      <!-- 型号列表 -->
+      <el-table :data="typeList" style="width: 100%" v-loading="loading">
+        <el-table-column prop="id" label="型号ID" width="120" />
+        <el-table-column prop="childName" label="型号名称" min-width="180">
           <template #default="{ row }">
-            <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            <span v-if="!row._editing">{{ row.childName }}</span>
+            <el-input
+              v-else
+              v-model="row._editName"
+              size="small"
+              style="width: 200px;"
+              @keyup.enter="handleSaveName(row)"
+              @keyup.escape="handleCancelEdit(row)"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column prop="product_name" label="所属商品" min-width="200" show-overflow-tooltip>
+          <template #default="{ row }">
+            {{ row.product_name || '未知商品' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="200" fixed="right">
+          <template #default="{ row }">
+            <template v-if="!row._editing">
+              <el-button type="primary" size="small" @click="handleEdit(row)">修改名称</el-button>
+            </template>
+            <template v-else>
+              <el-button type="success" size="small" @click="handleSaveName(row)">保存</el-button>
+              <el-button size="small" @click="handleCancelEdit(row)">取消</el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -31,218 +72,141 @@
         @current-change="handlePageChange"
       />
     </el-card>
-
-    <!-- 添加/编辑弹窗 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="dialogTitle"
-      width="500px"
-    >
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
-        <el-form-item label="规格名称" prop="spec_name">
-          <el-input v-model="form.spec_name" placeholder="请输入规格名称，如：颜色、尺寸、重量" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit">确定</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import {
-  getAllSpecs,
-  createSpec,
-  updateSpec,
-  deleteSpec
-} from '@/api/productSpec'
+import { ElMessage } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
+import { getTypeList, updateTypeName } from '@/api/productSpec'
 
-interface Spec {
+interface TypeItem {
   id: number
-  spec_name: string
-  sort_order: number
+  goodid: number
+  childName: string
+  product_name: string
+  _editing?: boolean
+  _editName?: string
 }
 
-// 规格列表
-const specs = ref<Spec[]>([])
-const allSpecs = ref<Spec[]>([]) // 存储所有规格数据
+const typeList = ref<TypeItem[]>([])
 const loading = ref(false)
 
-// 分页
+const searchForm = reactive({
+  product_id: '',
+  type_id: '',
+  type_name: ''
+})
+
 const pagination = reactive({
   current: 1,
   pageSize: 10,
   total: 0
 })
 
-// 弹窗
-const dialogVisible = ref(false)
-const dialogTitle = ref('添加规格')
-const formRef = ref<FormInstance>()
-
-const form = reactive({
-  id: 0,
-  spec_name: ''
-})
-
-const rules: FormRules = {
-  spec_name: [{ required: true, message: '请输入规格名称', trigger: 'blur' }]
-}
-
-// 加载规格列表
-const loadSpecs = async () => {
+const loadTypeList = async () => {
   loading.value = true
   try {
-    const res: any = await getAllSpecs()
-    console.log('规格列表响应:', res)
+    const params: any = {
+      page: pagination.current,
+      pageSize: pagination.pageSize
+    }
+    if (searchForm.product_id) params.product_id = searchForm.product_id
+    if (searchForm.type_id) params.type_id = searchForm.type_id
+    if (searchForm.type_name) params.type_name = searchForm.type_name
+
+    const res: any = await getTypeList(params)
     if (res.code === 0) {
-      allSpecs.value = res.data || []
-      pagination.total = allSpecs.value.length
-      updatePageData()
+      typeList.value = (res.data.list || []).map((item: TypeItem) => ({
+        ...item,
+        _editing: false,
+        _editName: ''
+      }))
+      pagination.total = res.data.pagination?.total || 0
     } else {
-      ElMessage.error(res.message || '获取规格列表失败')
+      ElMessage.error(res.message || '获取型号列表失败')
     }
   } catch (error: any) {
-    console.error('加载规格列表失败:', error)
-    ElMessage.error(error.response?.data?.message || error.message || '加载规格列表失败')
+    console.error('获取型号列表失败:', error)
+    ElMessage.error(error.response?.data?.message || error.message || '获取型号列表失败')
   } finally {
     loading.value = false
   }
 }
 
-// 更新当前页数据
-const updatePageData = () => {
-  const start = (pagination.current - 1) * pagination.pageSize
-  const end = start + pagination.pageSize
-  specs.value = allSpecs.value.slice(start, end)
+const handleSearch = () => {
+  pagination.current = 1
+  loadTypeList()
 }
 
-// 页码变化
+const handleReset = () => {
+  searchForm.product_id = ''
+  searchForm.type_id = ''
+  searchForm.type_name = ''
+  pagination.current = 1
+  loadTypeList()
+}
+
 const handlePageChange = (page: number) => {
   pagination.current = page
-  updatePageData()
+  loadTypeList()
 }
 
-// 每页数量变化
 const handlePageSizeChange = (pageSize: number) => {
   pagination.pageSize = pageSize
   pagination.current = 1
-  updatePageData()
+  loadTypeList()
 }
 
-// 计算序号
-const indexMethod = (index: number) => {
-  return (pagination.current - 1) * pagination.pageSize + index + 1
+const handleEdit = (row: TypeItem) => {
+  row._editing = true
+  row._editName = row.childName
 }
 
-// 添加规格
-const handleAdd = () => {
-  dialogTitle.value = '添加规格'
-  form.id = 0
-  form.spec_name = ''
-  dialogVisible.value = true
+const handleCancelEdit = (row: TypeItem) => {
+  row._editing = false
+  row._editName = ''
 }
 
-// 编辑规格
-const handleEdit = (row: Spec) => {
-  dialogTitle.value = '编辑规格'
-  form.id = row.id
-  form.spec_name = row.spec_name
-  dialogVisible.value = true
-}
+const handleSaveName = async (row: TypeItem) => {
+  if (!row._editName || !row._editName.trim()) {
+    ElMessage.warning('型号名称不能为空')
+    return
+  }
+  if (row._editName.trim() === row.childName) {
+    row._editing = false
+    return
+  }
 
-// 删除规格
-const handleDelete = async (row: Spec) => {
   try {
-    await ElMessageBox.confirm('确定要删除该规格吗？删除后会影响已关联该规格的商品', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-
-    const res: any = await deleteSpec(row.id)
+    const res: any = await updateTypeName(row.id, { childName: row._editName.trim() })
     if (res.code === 0) {
-      ElMessage.success('删除成功')
-      // 检查当前页是否为空，如果为空且不是第一页，则跳转到上一页
-      const totalPages = Math.ceil((pagination.total - 1) / pagination.pageSize)
-      if (pagination.current > totalPages && pagination.current > 1) {
-        pagination.current = totalPages
-      }
-      await loadSpecs()
+      ElMessage.success('修改成功')
+      row.childName = row._editName.trim()
+      row._editing = false
     } else {
-      ElMessage.error(res.message || '删除失败')
+      ElMessage.error(res.message || '修改失败')
     }
   } catch (error: any) {
-    if (error !== 'cancel') {
-      console.error('删除规格失败:', error)
-      ElMessage.error(error.response?.data?.message || '删除失败')
-    }
+    console.error('修改型号名称失败:', error)
+    ElMessage.error(error.response?.data?.message || '修改失败')
   }
 }
 
-// 提交表单
-const handleSubmit = async () => {
-  if (!formRef.value) return
-
-  await formRef.value.validate(async (valid) => {
-    if (valid) {
-      try {
-        const data = {
-          spec_name: form.spec_name.trim(),
-          sort_order: allSpecs.value.length
-        }
-
-        let res: any
-        if (form.id) {
-          res = await updateSpec(form.id, data)
-        } else {
-          res = await createSpec(data)
-        }
-
-        if (res.code === 0) {
-          ElMessage.success(form.id ? '编辑成功' : '添加成功')
-          dialogVisible.value = false
-          await loadSpecs()
-          // 如果是添加操作，跳转到最后一页
-          if (!form.id) {
-            const totalPages = Math.ceil(pagination.total / pagination.pageSize)
-            pagination.current = totalPages
-            updatePageData()
-          }
-        } else {
-          ElMessage.error(res.message || '操作失败')
-        }
-      } catch (error: any) {
-        console.error('提交失败:', error)
-        ElMessage.error(error.response?.data?.message || '操作失败')
-      }
-    }
-  })
-}
-
 onMounted(() => {
-  loadSpecs()
+  loadTypeList()
 })
 </script>
 
 <style scoped>
-.product-spec-container {
-  padding: 20px;
-}
-
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.el-pagination {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
+.search-form {
+  margin-bottom: 20px;
 }
 </style>

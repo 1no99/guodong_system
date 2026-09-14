@@ -71,7 +71,8 @@ export const getImageUrl = (url: string): string => {
 
 // 创建axios实例
 const request = axios.create({
-  baseURL: 'https://guodongyichu.fun/api',
+  // baseURL: 'https://guodongyichu.fun/api',
+  baseURL: 'http://localhost:3000/api',
   timeout: 60000
 })
 
