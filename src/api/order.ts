@@ -83,3 +83,8 @@ export const createOrderByAdmin = (data: {
 export const confirmPayment = (id: number) => {
   return request.put(`/order/admin/${id}/confirm-payment`)
 }
+
+// 记录打印次数（pay_type +1）
+export const incrementPrintCount = (id: number) => {
+  return request.put(`/order/admin/${id}/print-count`)
+}

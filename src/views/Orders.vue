@@ -162,7 +162,8 @@
        
       </div>
       <template #footer>
-        <el-button type="primary" @click="handlePrint">打印</el-button>
+        <span v-if="currentOrder?.pay_type" style="margin-right: 5px;color: red;">（已打印{{ currentOrder?.pay_type }}次）</span>
+        <el-button type="primary" @click="handlePrint">打印  </el-button>
         <el-button type="primary" @click="handleShare(currentOrder)">分享订单信息</el-button>
       </template>
     </el-dialog>
@@ -281,7 +282,8 @@ import {
   shipOrder,
   updateOrderStatus,
   createOrderByAdmin,
-  confirmPayment
+  confirmPayment,
+  incrementPrintCount
 } from '@/api/order'
 import { getAllProducts } from '@/api/product'
 
@@ -306,7 +308,7 @@ interface Order {
   receiver_phone: string
   receiver_address: string
   created_at: string
-  pay_time: string | null
+  pay_time: string | null,
   items?: OrderItem[]
   total_items?: number
   username?: string
@@ -513,7 +515,9 @@ const handleView = async (row: Order) => {
   }
 }
 
-const handlePrint = () => {
+const handlePrint = async () => {
+  if (!currentOrder.value) return
+  currentOrder.value.pay_type = String(Number(currentOrder.value.pay_type || 0) + 1)
   const printContent = document.getElementById('printArea')
   if (!printContent) return
 
@@ -546,6 +550,13 @@ const handlePrint = () => {
   printWindow?.focus()
   printWindow?.print()
   printWindow?.close()
+
+  // 记录打印次数
+  try {
+    await incrementPrintCount(currentOrder.value!.id)
+  } catch (error) {
+    console.error('记录打印次数失败:', error)
+  }
 }
 
 const handleShip = (row: Order) => {

@@ -98,3 +98,20 @@ export const toggleUserStatus = (id: number, status: string) => {
 export const resetUserPassword = (id: number, password: string) => {
   return request.put(`/user/admin/users/${id}/password`, { password })
 }
+
+// ============ 代客下单用户管理接口 ============
+
+// 获取代客下单用户列表
+export const getSuperAdminList = () => {
+  return request.get('/user/superadmin')
+}
+
+// 新增代客下单用户
+export const createSuperAdmin = (data: { phone: string }) => {
+  return request.post('/user/superadmin', data)
+}
+
+// 删除代客下单用户
+export const deleteSuperAdmin = (id: number) => {
+  return request.delete(`/user/superadmin/${id}`)
+}
